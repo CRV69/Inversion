@@ -13,7 +13,7 @@
   </script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    .tab-active { color: #2563eb; font-weight: 600; background-color: #f1f5f9; border-radius: 8px; }
+    .tab-active { color: #2563eb; font-weight: 700; background-color: #f1f5f9; border-radius: 8px; }
     .dark .tab-active { color: #60a5fa; background-color: #1e293b; }
   </style>
 </head>
@@ -186,22 +186,22 @@
     </div>
   </main>
 
-  <!-- BARRA DE NAVEGACIÓN INFERIOR (Iconos grandes y centrados) -->
-  <nav class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 grid grid-cols-5 text-[11px] font-medium text-gray-600 dark:text-gray-300 fixed bottom-0 left-0 right-0 z-40 shadow-lg py-2">
-    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-1 px-1 flex flex-col items-center gap-1 tab-active">
-      <span class="text-xl">📊</span> <span class="truncate w-full text-center">Dash</span>
+  <!-- BARRA DE NAVEGACIÓN INFERIOR (Textos completos y sin abreviaturas + Iconos extra grandes) -->
+  <nav class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 grid grid-cols-5 text-[9px] sm:text-[11px] font-medium text-gray-600 dark:text-gray-300 fixed bottom-0 left-0 right-0 z-40 shadow-lg py-1.5">
+    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-1 px-0.5 flex flex-col items-center gap-1 tab-active">
+      <span class="text-2xl">📊</span> <span class="whitespace-nowrap text-center">Dashboard</span>
     </button>
-    <button onclick="switchTab('operaciones')" id="tab-operaciones" class="py-1 px-1 flex flex-col items-center gap-1">
-      <span class="text-xl">📋</span> <span class="truncate w-full text-center">Ops</span>
+    <button onclick="switchTab('operaciones')" id="tab-operaciones" class="py-1 px-0.5 flex flex-col items-center gap-1">
+      <span class="text-2xl">📋</span> <span class="whitespace-nowrap text-center">Operaciones</span>
     </button>
-    <button onclick="switchTab('dividendos')" id="tab-dividendos" class="py-1 px-1 flex flex-col items-center gap-1">
-      <span class="text-xl">🪙</span> <span class="truncate w-full text-center">Divs</span>
+    <button onclick="switchTab('dividendos')" id="tab-dividendos" class="py-1 px-0.5 flex flex-col items-center gap-1">
+      <span class="text-2xl">🪙</span> <span class="whitespace-nowrap text-center">Dividendos</span>
     </button>
-    <button onclick="switchTab('intereses')" id="tab-intereses" class="py-1 px-1 flex flex-col items-center gap-1">
-      <span class="text-xl">💰</span> <span class="truncate w-full text-center">Int</span>
+    <button onclick="switchTab('intereses')" id="tab-intereses" class="py-1 px-0.5 flex flex-col items-center gap-1">
+      <span class="text-2xl">💰</span> <span class="whitespace-nowrap text-center">Intereses</span>
     </button>
-    <button onclick="switchTab('ajustes')" id="tab-ajustes" class="py-1 px-1 flex flex-col items-center gap-1">
-      <span class="text-xl">⚙️</span> <span class="truncate w-full text-center">Ajustes</span>
+    <button onclick="switchTab('ajustes')" id="tab-ajustes" class="py-1 px-0.5 flex flex-col items-center gap-1">
+      <span class="text-2xl">⚙️</span> <span class="whitespace-nowrap text-center">Ajustes</span>
     </button>
   </nav>
 
@@ -303,7 +303,7 @@
 
   <!-- SCRIPT -->
   <script>
-    const STORAGE_KEY = 'tradingData_MultiYear_v11';
+    const STORAGE_KEY = 'tradingData_MultiYear_v12';
 
     const initial2026 = {
       operaciones: [
