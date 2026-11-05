@@ -78,7 +78,18 @@
       </div>
     </div>
 
-    <!-- Gráfico -->
+    <!-- BOTÓN DE ACCESO AL INFORME DE ACCIONES -->
+    <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Informe de Acciones y Rentabilidad</h3>
+        <p class="text-[11px] text-gray-500 dark:text-gray-400">Pulsa para ver porcentajes y ganancias por activo.</p>
+      </div>
+      <button onclick="toggleModal('modal-informe-acciones', true)" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2.5 rounded-lg font-semibold shadow flex items-center gap-1.5 whitespace-nowrap">
+        📊 Ver Informe
+      </button>
+    </div>
+
+    <!-- Gráfico de Evolución Mensual -->
     <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
       <h3 class="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">Evolución Mensual Trading (<span class="lbl-anio">2026</span>)</h3>
       <div class="h-64 relative">
@@ -86,6 +97,51 @@
       </div>
     </div>
   </main>
+
+  <!-- MODAL PANTALLA: INFORME DE RENDIMIENTO POR ACCIÓN (Se abre al pulsar el botón) -->
+  <div id="modal-informe-acciones" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl max-w-2xl w-full space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center border-b pb-3 dark:border-slate-800">
+        <div>
+          <h3 class="font-bold text-base text-gray-800 dark:text-gray-100">📊 Informe Detallado por Acción</h3>
+          <p class="text-[11px] text-gray-500">Año fiscal activo: <span class="lbl-anio font-bold">2026</span></p>
+        </div>
+        <button onclick="toggleModal('modal-informe-acciones', false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg font-bold px-2">✕</button>
+      </div>
+
+      <!-- Tarjeta Resumen con Porcentaje Medio -->
+      <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border dark:border-slate-700 text-xs">
+        <div>
+          <p class="text-gray-500 dark:text-gray-400">Rentabilidad Media Global</p>
+          <p id="lbl-pct-medio" class="text-base font-bold text-blue-600 dark:text-blue-400">0.00%</p>
+        </div>
+        <div>
+          <p class="text-gray-500 dark:text-gray-400">Total Activos Operados</p>
+          <p id="lbl-total-activos" class="text-base font-bold text-gray-800 dark:text-gray-100">0</p>
+        </div>
+      </div>
+
+      <!-- Tabla de Datos -->
+      <div class="overflow-y-auto flex-1 border dark:border-slate-800 rounded-xl">
+        <table class="w-full text-left text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap">
+          <thead class="bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 uppercase text-[10px] sticky top-0">
+            <tr>
+              <th class="p-3">Activo</th>
+              <th class="p-3 text-center">Ops</th>
+              <th class="p-3 text-right">Invertido</th>
+              <th class="p-3 text-right">Resultado (€)</th>
+              <th class="p-3 text-right">Rentabilidad (%)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-rendimiento-accion-modal" class="divide-y divide-gray-100 dark:divide-slate-800"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="toggleModal('modal-informe-acciones', false)" class="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-xl text-xs font-semibold">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- SECCIÓN OPERACIONES -->
   <main id="sec-operaciones" class="p-4 space-y-4 max-w-5xl mx-auto hidden">
@@ -103,7 +159,7 @@
             <th class="p-3">Acciones</th>
             <th class="p-3">Invertido</th>
             <th class="p-3">Resultado</th>
-            <th class="p-3">ROI</th>
+            <th class="p-3">ROI (%)</th>
             <th class="p-3">Estado</th>
             <th class="p-3 text-center">Acciones</th>
           </tr>
@@ -186,7 +242,7 @@
     </div>
   </main>
 
-  <!-- BARRA DE NAVEGACIÓN INFERIOR (Textos completos y sin abreviaturas + Iconos extra grandes) -->
+  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
   <nav class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 grid grid-cols-5 text-[9px] sm:text-[11px] font-medium text-gray-600 dark:text-gray-300 fixed bottom-0 left-0 right-0 z-40 shadow-lg py-1.5">
     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-1 px-0.5 flex flex-col items-center gap-1 tab-active">
       <span class="text-2xl">📊</span> <span class="whitespace-nowrap text-center">Dashboard</span>
@@ -303,7 +359,7 @@
 
   <!-- SCRIPT -->
   <script>
-    const STORAGE_KEY = 'tradingData_MultiYear_v12';
+    const STORAGE_KEY = 'tradingData_MultiYear_v16';
 
     const initial2026 = {
       operaciones: [
@@ -650,11 +706,16 @@
       let capitalPorMes = {};
       let mensual = { '01': 0, '02': 0, '03': 0, '04': 0, '05': 0, '06': 0, '07': 0, '08': 0, '09': 0, '10': 0, '11': 0, '12': 0 };
 
+      let rendimientoPorActivo = {};
+      let sumaPorcentajesOps = 0;
+
       data.operaciones.forEach(op => {
         let invertido = (op.acciones || 0) * (op.pEntrada || 0);
         let gastos = (op.cCompra || 0) + (op.cVenta || 0) + (op.impCompra || 0);
         let resultado = ((op.pSalida || 0) - (op.pEntrada || 0)) * (op.acciones || 0) - gastos;
+        let roiOp = invertido > 0 ? (resultado / invertido) * 100 : 0;
         
+        sumaPorcentajesOps += roiOp;
         totalTradingNeto += resultado;
         totalGastos += gastos;
         if (resultado > 0) wins++;
@@ -668,6 +729,14 @@
             if (mensual[mes] !== undefined) mensual[mes] += resultado;
           }
         }
+
+        const activoNom = op.activo.trim().toUpperCase();
+        if (!rendimientoPorActivo[activoNom]) {
+          rendimientoPorActivo[activoNom] = { opsCount: 0, invertidoTotal: 0, resultadoTotal: 0 };
+        }
+        rendimientoPorActivo[activoNom].opsCount += 1;
+        rendimientoPorActivo[activoNom].invertidoTotal += invertido;
+        rendimientoPorActivo[activoNom].resultadoTotal += resultado;
       });
 
       let mesesActivos = Object.keys(capitalPorMes).length || 1;
@@ -675,7 +744,6 @@
       let capitalMedioMensual = sumaCapitalMeses / mesesActivos;
 
       let totalIntereses = Object.values(data.intereses).reduce((a, b) => a + Number(b), 0);
-      
       let totalDividendos = data.dividendos.reduce((a, b) => {
         let bruto = (b.acciones || 0) * (b.divPorAccion || 0);
         return a + (bruto - (b.impuestos || 0));
@@ -685,6 +753,7 @@
       let beneficioParaRoi = totalTradingNeto + totalDividendos;
       let roiSinIntereses = capitalMedioMensual > 0 ? ((beneficioParaRoi / capitalMedioMensual) * 100) : 0;
       let winrate = data.operaciones.length > 0 ? ((wins / data.operaciones.length) * 100).toFixed(1) : 0;
+      let porcentajeMedioOps = data.operaciones.length > 0 ? (sumaPorcentajesOps / data.operaciones.length) : 0;
 
       // KPIs
       document.getElementById('kpi-neto-global').innerText = `€${beneficioTotalGlobal.toFixed(2)}`;
@@ -698,6 +767,32 @@
       document.getElementById('desglose-trading').innerText = `€${totalTradingNeto.toFixed(2)}`;
       document.getElementById('desglose-intereses').innerText = `€${totalIntereses.toFixed(2)}`;
       document.getElementById('desglose-dividendos').innerText = `€${totalDividendos.toFixed(2)}`;
+
+      // Resumen Modal Informe Acciones
+      document.getElementById('lbl-pct-medio').innerText = `${porcentajeMedioOps >= 0 ? '+' : ''}${porcentajeMedioOps.toFixed(2)}%`;
+      document.getElementById('lbl-pct-medio').className = `text-base font-bold ${porcentajeMedioOps >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`;
+      document.getElementById('lbl-total-activos').innerText = Object.keys(rendimientoPorActivo).length;
+
+      // Render Tabla Rendimiento por Acción (dentro del Modal)
+      const tbodyRend = document.getElementById('tbody-rendimiento-accion-modal');
+      tbodyRend.innerHTML = '';
+      const activosOrdenados = Object.keys(rendimientoPorActivo).sort((a,b) => rendimientoPorActivo[b].resultadoTotal - rendimientoPorActivo[a].resultadoTotal);
+      
+      activosOrdenados.forEach(act => {
+        const item = rendimientoPorActivo[act];
+        const pctRetorno = item.invertidoTotal > 0 ? (item.resultadoTotal / item.invertidoTotal) * 100 : 0;
+        const esPositivo = item.resultadoTotal >= 0;
+
+        tbodyRend.innerHTML += `
+          <tr class="hover:bg-gray-50 dark:hover:bg-slate-800">
+            <td class="p-3 font-bold">${act}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded font-semibold text-[10px]">${item.opsCount}</span></td>
+            <td class="p-3 text-right">€${item.invertidoTotal.toFixed(2)}</td>
+            <td class="p-3 text-right font-bold ${esPositivo ? 'text-green-600 dark:text-green-400' : 'text-red-500'}">€${item.resultadoTotal.toFixed(2)}</td>
+            <td class="p-3 text-right font-bold ${esPositivo ? 'text-green-600 dark:text-green-400' : 'text-red-500'}">${esPositivo ? '+' : ''}${pctRetorno.toFixed(2)}%</td>
+          </tr>
+        `;
+      });
 
       // Tabla Operaciones
       const tbody = document.getElementById('tbody-operaciones');
@@ -717,7 +812,7 @@
             <td class="p-3">${op.acciones}</td>
             <td class="p-3">€${invertido.toFixed(2)}</td>
             <td class="p-3 font-bold ${win ? 'text-green-600 dark:text-green-400' : 'text-red-500'}">€${resultado.toFixed(2)}</td>
-            <td class="p-3">${roi.toFixed(2)}%</td>
+            <td class="p-3 font-bold ${win ? 'text-green-600 dark:text-green-400' : 'text-red-500'}">${win ? '+' : ''}${roi.toFixed(2)}%</td>
             <td class="p-3"><span class="px-2 py-0.5 text-[10px] ${win ? 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300'} rounded font-bold">${win ? 'WIN' : 'LOSS'}</span></td>
             <td class="p-3 text-center space-x-1">
               <button onclick="openModalOperacion(${index})" class="text-blue-600 dark:text-blue-400 font-semibold px-1">✏️</button>
