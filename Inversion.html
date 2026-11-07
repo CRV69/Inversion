@@ -235,8 +235,8 @@
       <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Copia de Seguridad y Datos</h3>
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <span class="text-xs text-gray-600 dark:text-gray-400">Descargar copia de seguridad (.json)</span>
-          <button onclick="descargarBackupJSON()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-semibold">💾 Descargar Backup JSON</button>
+          <span class="text-xs text-gray-600 dark:text-gray-400">Exportar copia de seguridad (.json)</span>
+          <button onclick="descargarBackupJSON()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-semibold">💾 Exportar Backup JSON</button>
         </div>
         <div class="flex justify-between items-center pt-2 border-t dark:border-slate-800">
           <span class="text-xs text-gray-600 dark:text-gray-400">Restaura datos desde un fichero JSON</span>
@@ -512,23 +512,36 @@
       }
     }
 
-    // DESCARGAR DIRECTAMENTE FICHERO .JSON
+    // DESCARGAR / EXPORTAR BACKUP JSON (Versión 100% compatible Safari iOS & Webview)
     function descargarBackupJSON() {
-      const dataStr = JSON.stringify(appStorage, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const fechaHoy = new Date().toISOString().split('T')[0];
-      const fileName = `backup_portfolio_trading_${fechaHoy}.json`;
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      try {
+        const dataStr = JSON.stringify(appStorage, null, 2);
+        
+        // 1. Intentar descarga mediante Data URI nativo
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const fechaHoy = new Date().toISOString().split('T')[0];
+        const fileName = `backup_portfolio_trading_${fechaHoy}.json`;
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', dataUri);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error(err);
+      }
+
+      // 2. Respaldo de seguridad para Safari iOS / Koder: si no descarga el archivo, abre ventana con el JSON formateado
+      setTimeout(() => {
+        const dataStr = JSON.stringify(appStorage, null, 2);
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+          newWindow.document.write('<pre style="word-wrap: break-word; white-space: pre-wrap; font-family: monospace; padding: 15px;">' + dataStr + '</pre>');
+          newWindow.document.title = "Backup JSON - Copiar o Guardar";
+          newWindow.document.close();
+        }
+      }, 300);
     }
 
     function restaurarBackupFichero(event) {
