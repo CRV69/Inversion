@@ -235,8 +235,8 @@
       <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Copia de Seguridad y Datos</h3>
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <span class="text-xs text-gray-600 dark:text-gray-400">Copia el backup al portapapeles</span>
-          <button onclick="exportarBackupClipboard()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-semibold">💾 Copiar Backup</button>
+          <span class="text-xs text-gray-600 dark:text-gray-400">Descargar copia de seguridad (.json)</span>
+          <button onclick="descargarBackupJSON()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-semibold">💾 Descargar Backup JSON</button>
         </div>
         <div class="flex justify-between items-center pt-2 border-t dark:border-slate-800">
           <span class="text-xs text-gray-600 dark:text-gray-400">Restaura datos desde un fichero JSON</span>
@@ -512,13 +512,24 @@
       }
     }
 
-    function exportarBackupClipboard() {
-      const dataStr = JSON.stringify(appStorage, null, 2);
-      navigator.clipboard.writeText(dataStr).then(() => {
-        alert("¡Copia de seguridad copiada al portapapeles con éxito!");
-      }).catch(err => {
-        alert("Error al copiar al portapapeles: " + err);
-      });
+    // DESCARGAR DIRECTAMENTE FICHERO .JSON (Compatible Webview / Móvil)
+    function descargarBackupJSON() {
+      try {
+        const dataStr = JSON.stringify(appStorage, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        
+        const fechaHoy = new Date().toISOString().split('T')[0];
+        const fileName = `backup_portfolio_trading_${fechaHoy}.json`;
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', dataUri);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        alert("Error al descargar el archivo: " + err.message);
+      }
     }
 
     function restaurarBackupFichero(event) {
