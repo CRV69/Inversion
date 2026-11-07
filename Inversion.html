@@ -512,24 +512,23 @@
       }
     }
 
-    // DESCARGAR DIRECTAMENTE FICHERO .JSON (Compatible Webview / Móvil)
+    // DESCARGAR DIRECTAMENTE FICHERO .JSON
     function descargarBackupJSON() {
-      try {
-        const dataStr = JSON.stringify(appStorage, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-        
-        const fechaHoy = new Date().toISOString().split('T')[0];
-        const fileName = `backup_portfolio_trading_${fechaHoy}.json`;
-        
-        const link = document.createElement('a');
-        link.setAttribute('href', dataUri);
-        link.setAttribute('download', fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (err) {
-        alert("Error al descargar el archivo: " + err.message);
-      }
+      const dataStr = JSON.stringify(appStorage, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const fechaHoy = new Date().toISOString().split('T')[0];
+      const fileName = `backup_portfolio_trading_${fechaHoy}.json`;
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
 
     function restaurarBackupFichero(event) {
